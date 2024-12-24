@@ -36,8 +36,8 @@ CONTAINER_TOOL ?= docker
 
 # Image URL to use all building/pushing image targets
 IMAGE_REGISTRY ?= docker.io
-IMAGE_REPOSITORY ?= kubeflow/spark-operator
-IMAGE_TAG ?= $(VERSION)
+IMAGE_REPOSITORY ?= rubiklabs/spark-operator
+IMAGE_TAG ?= 3.5.2-exp.003
 IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY):$(IMAGE_TAG)
 
 # Kind cluster
@@ -220,7 +220,7 @@ PLATFORMS ?= linux/amd64,linux/arm64
 docker-buildx: ## Build and push docker image for the operator for cross-platform support
 	- $(CONTAINER_TOOL) buildx create --name spark-operator-builder
 	$(CONTAINER_TOOL) buildx use spark-operator-builder
-	- $(CONTAINER_TOOL) buildx build --push --platform=$(PLATFORMS) --tag ${IMAGE} -f Dockerfile .
+	- $(CONTAINER_TOOL) buildx build --sbom=true --provenance=true --push --platform=$(PLATFORMS) --tag ${IMAGE} -f Dockerfile .
 	- $(CONTAINER_TOOL) buildx rm spark-operator-builder
 
 ##@ Helm
