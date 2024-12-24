@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG SPARK_IMAGE=spark:3.5.3
+ARG SPARK_IMAGE=rubiklabs/spark:3.5.2.java.17.0.13.ubuntu.22.04-02
 
 FROM golang:1.23.1 AS builder
 
@@ -51,9 +51,16 @@ RUN mkdir -p /etc/k8s-webhook-server/serving-certs /home/spark && \
     chmod -R g+rw /etc/k8s-webhook-server/serving-certs && \
     chown -R spark /etc/k8s-webhook-server/serving-certs /home/spark
 
+RUN rm -f /opt/spark/jars/parquet-jackson-1.13.1.jar \
+          /opt/spark/jars/commons-lang-2.6.jar \
+          /opt/spark/jars/hive-llap-common-2.3.9.jar \
+          /opt/spark/jars/commons-lang3-3.12.0.jar
+
 USER ${SPARK_UID}:${SPARK_GID}
 
 COPY --from=builder /workspace/bin/spark-operator /usr/bin/spark-operator
+
+COPY --from=builder /workspace/jars /opt/spark/jars
 
 COPY entrypoint.sh /usr/bin/
 
