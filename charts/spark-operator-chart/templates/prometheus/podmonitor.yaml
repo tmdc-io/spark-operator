@@ -18,9 +18,6 @@ limitations under the License.
 {{- if not .Values.prometheus.metrics.enable }}
 {{- fail "`metrics.enable` must be set to true when `podMonitor.create` is true." }}
 {{- end }}
-{{- if not (.Capabilities.APIVersions.Has "monitoring.coreos.com/v1/PodMonitor") }}
-{{- fail "The cluster does not support the required API version `monitoring.coreos.com/v1` for `PodMonitor`." }}
-{{- end }}
 apiVersion: monitoring.coreos.com/v1
 kind: PodMonitor
 metadata:

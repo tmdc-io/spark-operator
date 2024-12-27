@@ -348,3 +348,42 @@ GOBIN=$(LOCALBIN) go install $${package} ;\
 mv "$$(echo "$(1)" | sed "s/-$(3)$$//")" $(1) ;\
 }
 endef
+
+#######################################################
+# ----------> Tmdc Helm Chart push to ECR <-----------#
+#######################################################
+
+CH_DIR = charts
+DIR = spark-operator-chart
+VERSION = ${TAG}
+CHART_NAME = spark-operator
+PACKAGED_CHART = ${CHART_NAME}-${VERSION}.tgz
+
+push-chart:
+	@echo "=== Helm login ==="
+	aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | helm3.6.3 registry login ${ECR_HOST} --username AWS --password-stdin --debug
+	@echo "=== Save chart ==="
+	helm3.6.3 chart save ${CH_DIR}/${DIR}/ ${ECR_HOST}/dataos-base-charts:${CHART_NAME}-${VERSION}
+	@echo
+	@echo "=== Push chart ==="
+	helm3.6.3 chart push ${ECR_HOST}/dataos-base-charts:${CHART_NAME}-${VERSION}
+	@echo
+	@echo "=== Logout of registry ==="
+	helm3.6.3 registry logout ${ECR_HOST}
+
+push-oci-chart:
+	@echo
+	echo "=== login to OCI registry ==="
+	aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | helm3.14.0 registry login ${ECR_HOST} --username AWS --password-stdin --debug
+	@echo
+	@echo "=== package OCI chart ==="
+	helm3.14.0 package ${CH_DIR}/${DIR}/ --version ${VERSION}
+	@echo
+	@echo "=== create repository ==="
+	aws ecr describe-repositories --repository-names ${CHART_NAME} || aws ecr create-repository --repository-name ${CHART_NAME} --region $(AWS_DEFAULT_REGION) --no-cli-pager
+	@echo
+	@echo "=== push OCI chart ==="
+	helm3.14.0 push ${PACKAGED_CHART} oci://$(ECR_HOST)
+	@echo
+	@echo "=== logout of registry ==="
+	helm3.14.0 registry logout $(ECR_HOST)
