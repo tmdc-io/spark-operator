@@ -36,8 +36,8 @@ CONTAINER_TOOL ?= docker
 
 # Image URL to use all building/pushing image targets
 IMAGE_REGISTRY ?= docker.io
-IMAGE_REPOSITORY ?= kubeflow/spark-operator
-IMAGE_TAG ?= $(VERSION)
+IMAGE_REPOSITORY ?= rubiklabs/spark-operator
+IMAGE_TAG ?= 3.5.2-02
 IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY):$(IMAGE_TAG)
 
 # Kind cluster
