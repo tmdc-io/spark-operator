@@ -9,3 +9,4 @@ sparkctl/sparkctl-darwin-amd64
 # Various IDEs
 .idea/
 .vscode/
+.codegpt

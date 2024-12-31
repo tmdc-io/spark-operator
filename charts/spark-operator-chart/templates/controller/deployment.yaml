@@ -133,16 +133,16 @@ spec:
         resources:
           {{- toYaml . | nindent 10 }}
         {{- end }}
-        livenessProbe:
-          httpGet:
-            port: 8081
-            scheme: HTTP
-            path: /healthz
-        readinessProbe:
-          httpGet:
-            port: 8081
-            scheme: HTTP
-            path: /readyz
+        # livenessProbe:
+        #   httpGet:
+        #     port: 8081
+        #     scheme: HTTP
+        #     path: /healthz
+        # readinessProbe:
+        #   httpGet:
+        #     port: 8081
+        #     scheme: HTTP
+        #     path: /readyz
         {{- with .Values.controller.securityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}
