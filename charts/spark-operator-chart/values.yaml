@@ -393,3 +393,5 @@ prometheus:
     podMetricsEndpoint:
       scheme: http
       interval: 5s
+
+tenantId: ''
