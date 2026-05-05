@@ -14,7 +14,7 @@
 # limitations under the License.
 #
 
-ARG SPARK_IMAGE=tmdcio/spark:3.5.2.java.17.0.13.ubuntu.22.04-03
+ARG SPARK_IMAGE=tmdcio/spark:3.5.2.java.17.0.13.ubuntu.22.04-05
 
 FROM golang:1.23.1 AS builder
 
