@@ -37,7 +37,7 @@ CONTAINER_TOOL ?= docker
 # Image URL to use all building/pushing image targets
 IMAGE_REGISTRY ?= docker.io
 IMAGE_REPOSITORY ?= tmdcio/spark-operator
-IMAGE_TAG ?= 3.5.2-05
+IMAGE_TAG ?= 3.5.2-07
 IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY):$(IMAGE_TAG)
 
 # Kind cluster

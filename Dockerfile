@@ -14,9 +14,9 @@
 # limitations under the License.
 #
 
-ARG SPARK_IMAGE=tmdcio/spark:3.5.2.java.17.0.13.ubuntu.22.04-05
+ARG SPARK_IMAGE=tmdcio/spark:3.5.2.java.17.0.13.ubuntu.22.04-06
 
-FROM golang:1.23.1 AS builder
+FROM golang:1.25.0 AS builder
 
 WORKDIR /workspace
 
@@ -55,6 +55,8 @@ RUN rm -f /opt/spark/jars/parquet-jackson-1.13.1.jar \
           /opt/spark/jars/commons-lang-2.6.jar \
           /opt/spark/jars/hive-llap-common-2.3.9.jar \
           /opt/spark/jars/commons-lang3-3.12.0.jar
+
+RUN rm -f /opt/spark/RELEASE
 
 USER ${SPARK_UID}:${SPARK_GID}
 
