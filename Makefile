@@ -13,7 +13,7 @@ SHELL = /usr/bin/env bash -o pipefail
 .SHELLFLAGS = -ec
 
 # Version information.
-VERSION ?= $(shell cat VERSION | sed "s/^v//")
+VERSION ?= 3.5.9-08
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%S%:z")
 GIT_COMMIT := $(shell git rev-parse HEAD)
 GIT_TAG := $(shell if [ -z "`git status --porcelain`" ]; then git describe --exact-match --tags HEAD 2>/dev/null; fi)
@@ -35,8 +35,8 @@ UNAME := `uname | tr '[:upper:]' '[:lower:]'`
 CONTAINER_TOOL ?= docker
 
 # Image URL to use all building/pushing image targets
-IMAGE_REGISTRY ?= ghcr.io
-IMAGE_REPOSITORY ?= kubeflow/spark-operator/controller
+IMAGE_REGISTRY ?= docker.io
+IMAGE_REPOSITORY ?= tmdcio/spark-operator
 IMAGE_TAG ?= $(VERSION)
 IMAGE ?= $(IMAGE_REGISTRY)/$(IMAGE_REPOSITORY):$(IMAGE_TAG)
 

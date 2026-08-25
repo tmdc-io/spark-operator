@@ -14,25 +14,30 @@
 # limitations under the License.
 #
 
-ARG SPARK_IMAGE=spark:3.5.5
+ARG SPARK_IMAGE=tmdcio/spark:3.5.9-jammy-fips-curated.v2
 
-FROM golang:1.24.1 AS builder
+FROM golang:1.26.6 AS builder
 
 WORKDIR /workspace
+
+ENV GOPROXY=https://proxy.golang.org,direct
+ENV GOSUMDB=sum.golang.org
+ENV GOCACHE=/root/.cache/go-build
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=bind,source=go.mod,target=go.mod \
     --mount=type=bind,source=go.sum,target=go.sum \
+    rm -rf /go/pkg/mod/gopkg.in/yaml.v3@* /go/pkg/mod/cache/download/gopkg.in/yaml.v3 && \
     go mod download
 
 COPY . .
-
-ENV GOCACHE=/root/.cache/go-build
 
 ARG TARGETARCH
 
 RUN --mount=type=cache,target=/go/pkg/mod/ \
     --mount=type=cache,target="/root/.cache/go-build" \
+    rm -rf /go/pkg/mod/gopkg.in/yaml.v3@* /go/pkg/mod/cache/download/gopkg.in/yaml.v3 && \
+    go mod download && \
     CGO_ENABLED=0 GOOS=linux GOARCH=${TARGETARCH} GO111MODULE=on make build-operator
 
 FROM ${SPARK_IMAGE}
@@ -50,6 +55,25 @@ RUN apt-get update \
 RUN mkdir -p /etc/k8s-webhook-server/serving-certs /home/spark && \
     chmod -R g+rw /etc/k8s-webhook-server/serving-certs && \
     chown -R spark /etc/k8s-webhook-server/serving-certs /home/spark
+
+# Spark K8s client (okhttp 4.x) plus CVE remediations for the curated image.
+# hive-exec is replaced with the 4.0.1 *core* classifier only (not the fat jar)
+# so Spark's remaining Hive 2.3.9 modules stay in place.
+COPY jars/kotlin-stdlib-2.2.21.jar \
+     jars/okio-jvm-3.4.0.jar \
+     jars/logging-interceptor-4.9.2.jar \
+     jars/netty-codec-http-4.2.17.Final.jar \
+     jars/hive-exec-4.0.1-core.jar \
+     /opt/spark/jars/
+RUN rm -f \
+      /opt/spark/jars/okio-1.17.6.jar \
+      /opt/spark/jars/okio-2.8.0.jar \
+      /opt/spark/jars/logging-interceptor-3.12.12.jar \
+      /opt/spark/jars/jackson-mapper-asl-1.9.13.jar \
+      /opt/spark/jars/jackson-core-asl-1.9.13.jar \
+      /opt/spark/jars/commons-lang-2.6.jar \
+      /opt/spark/jars/netty-codec-http-4.2.16.Final.jar \
+      /opt/spark/jars/hive-exec-2.3.9-core.jar
 
 USER ${SPARK_UID}:${SPARK_GID}
 
